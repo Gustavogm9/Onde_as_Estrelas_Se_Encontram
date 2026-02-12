@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Onde as Estrelas Se Encontram</title>
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23060a14'/%3E%3Cpath d='M16 4l2.5 9.5L28 16l-9.5 2.5L16 28l-2.5-9.5L4 16l9.5-2.5Z' fill='%23d4a574'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%23f0d4a8'/%3E%3C/svg%3E">
+  <meta name="description"
+    content="Um livro interativo escrito com amor. Cada capítulo é uma experiência feita para Marinara.">
+  <!-- OG / Compartilhamento -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Onde as Estrelas Se Encontram">
+  <meta property="og:description"
+    content="Um livro interativo escrito com amor. Cada capítulo é uma experiência — cada página, uma estrela nossa.">
+  <meta property="og:site_name" content="Onde as Estrelas Se Encontram">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Onde as Estrelas Se Encontram">
+  <meta name="twitter:description"
+    content="Um livro interativo escrito com amor. Cada capítulo é uma experiência — cada página, uma estrela nossa.">
+  <meta name="theme-color" content="#060a14">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Petit+Formal+Script&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-deep: #060a14;
+      --bg-card: #0c1222;
+      --bg-card-hover: #111833;
+      --gold: #d4a574;
+      --gold-light: #f0d4a8;
+      --gold-bright: #f5deb3;
+      --cream: #f5e6d3;
+      --cream-soft: #e8d5c0;
+      --blue-soft: #4a6fa5;
+      --rose: #c47a7a;
+      --green-eye: #7ab88f;
+      --purple-soft: #8a7ab8;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      width: 100%;
+      min-height: 100vh;
+      background: var(--bg-deep);
+      font-family: 'Lora', serif;
+      color: var(--cream);
+      overflow-x: hidden;
+    }
+
+    /* ============ STARFIELD ============ */
+    .stars-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .star-dot {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(245, 230, 211, 0.6);
+    }
+
+    /* ============ PAGE TRANSITION OVERLAY ============ */
+    .page-transition {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--bg-deep);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+
+    .page-transition.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    /* ============ CONTENT WRAPPER ============ */
+    .content {
+      position: relative;
+      z-index: 10;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ============ HERO (CAPA DO LIVRO) ============ */
+    .hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 60px 30px;
+      text-align: center;
+      position: relative;
+    }
+
+    .hero-moon {
+      width: 6px;
+      height: 6px;
+      background: var(--gold-light);
+      border-radius: 50%;
+      box-shadow: 0 0 40px 15px rgba(212, 165, 116, 0.3), 0 0 80px 30px rgba(212, 165, 116, 0.15);
+      animation: moonPulse 4s ease-in-out infinite;
+      margin-bottom: 40px;
+      opacity: 0;
+      animation: moonPulse 4s ease-in-out infinite, fadeUp 2s ease 0.2s forwards;
+    }
+
+    @keyframes moonPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 40px 15px rgba(212, 165, 116, 0.3), 0 0 80px 30px rgba(212, 165, 116, 0.15);
+      }
+
+      50% {
+        box-shadow: 0 0 55px 22px rgba(212, 165, 116, 0.4), 0 0 100px 40px rgba(212, 165, 116, 0.2);
+      }
+    }
+
+    .hero-epigraph {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 12px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0;
+      animation: fadeUp 2s ease 0.5s forwards;
+      margin-bottom: 20px;
+    }
+
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(38px, 9vw, 76px);
+      color: var(--cream);
+      opacity: 0;
+      animation: fadeUp 2s ease 1s forwards;
+      line-height: 1.15;
+      margin-bottom: 8px;
+    }
+
+    .hero-title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .hero-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(14px, 3vw, 18px);
+      letter-spacing: 3px;
+      color: rgba(212, 165, 116, 0.6);
+      opacity: 0;
+      animation: fadeUp 1.8s ease 1.5s forwards;
+      margin-bottom: 35px;
+    }
+
+    .hero-quote {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: clamp(13px, 2.5vw, 16px);
+      color: var(--cream-soft);
+      opacity: 0;
+      animation: fadeUp 2s ease 2s forwards;
+      max-width: 520px;
+      line-height: 1.8;
+      padding: 0 20px;
+    }
+
+    .hero-scroll-hint {
+      position: absolute;
+      bottom: 35px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      opacity: 0;
+      animation: fadeUp 2s ease 3s forwards;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .hero-scroll-hint span {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(212, 165, 116, 0.4);
+    }
+
+    .scroll-arrow {
+      width: 20px;
+      height: 20px;
+      border-right: 1px solid rgba(212, 165, 116, 0.3);
+      border-bottom: 1px solid rgba(212, 165, 116, 0.3);
+      transform: rotate(45deg);
+      animation: arrowBounce 2.5s ease-in-out infinite;
+    }
+
+    @keyframes arrowBounce {
+
+      0%,
+      100% {
+        transform: rotate(45deg) translateY(0);
+        opacity: 0.4;
+      }
+
+      50% {
+        transform: rotate(45deg) translateY(6px);
+        opacity: 0.8;
+      }
+    }
+
+    /* ============ DIVIDER ============ */
+    .section-divider {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0 auto;
+    }
+
+    /* ============ SECTION ============ */
+    .book-section {
+      padding: 80px 30px;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .section-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(28px, 6vw, 44px);
+      color: var(--cream);
+      text-align: center;
+      margin-bottom: 16px;
+      line-height: 1.3;
+    }
+
+    .section-title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .section-desc {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: clamp(13px, 2.5vw, 15px);
+      color: rgba(232, 213, 192, 0.55);
+      text-align: center;
+      max-width: 480px;
+      margin: 0 auto 50px;
+      line-height: 1.7;
+    }
+
+    /* ============ EXPERIENCE CARDS ============ */
+    .experience-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 28px;
+      margin-top: 10px;
+    }
+
+    .experience-card {
+      background: linear-gradient(145deg, rgba(12, 18, 34, 0.9) 0%, rgba(8, 12, 24, 0.95) 100%);
+      border: 1px solid rgba(212, 165, 116, 0.12);
+      border-radius: 16px;
+      padding: 40px 30px 35px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      position: relative;
+      overflow: hidden;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .experience-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(212, 165, 116, 0.06) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity 0.6s ease;
+    }
+
+    .experience-card:hover {
+      border-color: rgba(212, 165, 116, 0.35);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px rgba(212, 165, 116, 0.08);
+    }
+
+    .experience-card:hover::before {
+      opacity: 1;
+    }
+
+    .card-tag {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 10px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--bg-deep);
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 22px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-icon {
+      font-size: 42px;
+      margin-bottom: 20px;
+      position: relative;
+      z-index: 1;
+      filter: drop-shadow(0 0 12px rgba(212, 165, 116, 0.2));
+      transition: transform 0.5s ease;
+    }
+
+    .experience-card:hover .card-icon {
+      transform: scale(1.12);
+    }
+
+    .card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: clamp(22px, 4vw, 28px);
+      color: var(--cream);
+      margin-bottom: 14px;
+      position: relative;
+      z-index: 1;
+      line-height: 1.3;
+    }
+
+    .card-desc {
+      font-family: 'Lora', serif;
+      font-size: clamp(12px, 2.2vw, 14px);
+      color: var(--cream-soft);
+      line-height: 1.7;
+      opacity: 0.7;
+      position: relative;
+      z-index: 1;
+      max-width: 300px;
+      margin-bottom: 25px;
+    }
+
+    .card-enter {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--gold);
+      border: 1px solid rgba(212, 165, 116, 0.25);
+      padding: 9px 24px;
+      border-radius: 4px;
+      position: relative;
+      z-index: 1;
+      transition: all 0.4s ease;
+    }
+
+    .experience-card:hover .card-enter {
+      border-color: var(--gold);
+      background: rgba(212, 165, 116, 0.1);
+      box-shadow: 0 0 20px rgba(212, 165, 116, 0.1);
+    }
+
+    /* ============ CHAPTERS PREVIEW ============ */
+    .chapters-preview {
+      padding: 60px 30px 40px;
+      text-align: center;
+    }
+
+    .chapters-coming {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(16px, 3vw, 20px);
+      color: rgba(212, 165, 116, 0.3);
+      font-style: italic;
+      margin-top: 30px;
+      letter-spacing: 2px;
+    }
+
+    .chapters-dots {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .chapters-dots span {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      border: 1px solid rgba(212, 165, 116, 0.2);
+      animation: dotFade 3s ease-in-out infinite;
+    }
+
+    .chapters-dots span:nth-child(2) {
+      animation-delay: 0.6s;
+    }
+
+    .chapters-dots span:nth-child(3) {
+      animation-delay: 1.2s;
+    }
+
+    @keyframes dotFade {
+
+      0%,
+      100% {
+        opacity: 0.3;
+        border-color: rgba(212, 165, 116, 0.15);
+      }
+
+      50% {
+        opacity: 0.8;
+        border-color: rgba(212, 165, 116, 0.4);
+        background: rgba(212, 165, 116, 0.1);
+      }
+    }
+
+    /* ============ FOOTER ============ */
+    .book-footer {
+      padding: 50px 30px 60px;
+      text-align: center;
+    }
+
+    .footer-divider {
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(212, 165, 116, 0.4), transparent);
+      margin: 0 auto 30px;
+    }
+
+    .footer-signature {
+      font-family: 'Petit Formal Script', cursive;
+      font-size: clamp(20px, 4vw, 28px);
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    .footer-message {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: 13px;
+      color: rgba(232, 213, 192, 0.35);
+      letter-spacing: 1px;
+    }
+
+    .footer-heart {
+      margin-top: 18px;
+      font-size: 18px;
+      color: var(--rose);
+      opacity: 0.6;
+      animation: heartBeat 3s ease-in-out infinite;
+    }
+
+    @keyframes heartBeat {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 0.5;
+      }
+
+      50% {
+        transform: scale(1.15);
+        opacity: 0.8;
+      }
+    }
+
+    /* ============ SCROLL ANIMATIONS ============ */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 1.2s ease, transform 1.2s ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .reveal-delay-1 {
+      transition-delay: 0.15s;
+    }
+
+    .reveal-delay-2 {
+      transition-delay: 0.3s;
+    }
+
+    .reveal-delay-3 {
+      transition-delay: 0.45s;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 640px) {
+      .hero {
+        padding: 50px 24px;
+      }
+
+      .book-section {
+        padding: 60px 20px;
+      }
+
+      .experience-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .experience-card {
+        padding: 32px 24px 28px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .hero-title {
+        font-size: 34px;
+      }
+
+      .experience-card {
+        padding: 28px 20px 24px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="stars-bg" id="starsBg"></div>
+
+  <!-- PAGE TRANSITION OVERLAY -->
+  <div class="page-transition" id="pageTransition"></div>
+
+  <div class="content">
+
+    <!-- ======== HERO — CAPA DO LIVRO ======== -->
+    <header class="hero">
+      <div class="hero-moon"></div>
+      <div class="hero-epigraph">Um livro escrito a dois</div>
+      <h1 class="hero-title">Onde as Estrelas <em>Se Encontram</em></h1>
+      <p class="hero-subtitle">um livro escrito a dois, para sempre</p>
+      <p class="hero-quote">
+        "Em um momento onde as pessoas se afastam por conta da tecnologia e pela distância de um mundo digital e
+        globalizado, duas pessoas se encontraram em um simples e mágico passar de dedos."
+      </p>
+      <a class="hero-scroll-hint" href="#introducao" onclick="scrollToIntro(event)">
+        <span>Abrir o livro</span>
+        <div class="scroll-arrow"></div>
+      </a>
+    </header>
+
+    <!-- ======== INTRODUÇÃO ======== -->
+    <div class="section-divider reveal"></div>
+
+    <section class="book-section" id="introducao">
+      <div class="section-label reveal">Introdução</div>
+      <h2 class="section-title reveal reveal-delay-1">Como <em>Tudo</em> Começou</h2>
+      <p class="section-desc reveal reveal-delay-2">
+        Antes do primeiro capítulo, existem os momentos que fizeram a história merecer ser contada. Escolha uma
+        experiência e reviva o início.
+      </p>
+
+      <div class="experience-grid">
+        <!-- Card 1 — Universo -->
+        <a class="experience-card reveal reveal-delay-1" href="universo-marinara.html"
+          onclick="navigateTo(event, 'universo-marinara.html')">
+          <div class="card-tag">Experiência Interativa</div>
+          <div class="card-icon">✦</div>
+          <div class="card-title">O Universo de Marinara</div>
+          <div class="card-desc">
+            Explore um céu de estrelas e descubra as constelações que guardam os fragmentos do que nasceu entre nós.
+          </div>
+          <div class="card-enter">Explorar o Céu</div>
+        </a>
+
+        <!-- Card 2 — Memórias -->
+        <a class="experience-card reveal reveal-delay-2" href="memorias-de-nos.html"
+          onclick="navigateTo(event, 'memorias-de-nos.html')">
+          <div class="card-tag">Jogo para Dois</div>
+          <div class="card-icon">🃏</div>
+          <div class="card-title">Memórias de Nós</div>
+          <div class="card-desc">
+            Um jogo da memória onde cada par esconde um pedaço da nossa história. Quem encontra mais memórias, vence.
+          </div>
+          <div class="card-enter">Jogar Juntos</div>
+        </a>
+      </div>
+    </section>
+
+    <!-- ======== CAPÍTULOS FUTUROS ======== -->
+    <div class="section-divider reveal"></div>
+
+    <section class="chapters-preview reveal">
+      <div class="section-label">Capítulos</div>
+      <div class="chapters-coming">a história continua sendo escrita...</div>
+      <div class="chapters-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </section>
+
+    <!-- ======== FOOTER ======== -->
+    <footer class="book-footer">
+      <div class="footer-divider"></div>
+      <div class="footer-signature reveal">Com amor, Gustavo</div>
+      <div class="footer-message reveal reveal-delay-1">para Marinara, sempre</div>
+      <div class="footer-heart reveal reveal-delay-2">♥</div>
+    </footer>
+
+  </div>
+
+  <script>
+    // ============ STARFIELD (CSS-based, mesma estética) ============
+    (function createStars() {
+      const bg = document.getElementById('starsBg');
+      for (let i = 0; i < 300; i++) {
+        const s = document.createElement('div');
+        s.className = 'star-dot';
+        const size = Math.random() * 2 + 0.3;
+        s.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random() * 100}%; top:${Math.random() * 100}%;
+      opacity:${Math.random() * 0.5 + 0.15};
+      animation: twinkle ${Math.random() * 5 + 3}s ease-in-out ${Math.random() * 4}s infinite alternate;
+    `;
+        bg.appendChild(s);
+      }
+      const style = document.createElement('style');
+      style.textContent = `@keyframes twinkle { from{opacity:0.1} to{opacity:0.65} }`;
+      document.head.appendChild(style);
+    })();
+
+    // ============ SCROLL REVEAL ============
+    const revealElements = document.querySelectorAll('.reveal');
+
+    function checkReveal() {
+      const trigger = window.innerHeight * 0.85;
+      revealElements.forEach(el => {
+        const top = el.getBoundingClientRect().top;
+        if (top < trigger) {
+          el.classList.add('visible');
+        }
+      });
+    }
+
+    window.addEventListener('scroll', checkReveal, { passive: true });
+    window.addEventListener('load', checkReveal);
+
+    // ============ SCROLL TO INTRO ============
+    function scrollToIntro(e) {
+      e.preventDefault();
+      const target = document.getElementById('introducao');
+      if (target) {
+        const y = target.getBoundingClientRect().top + window.pageYOffset - 40;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    }
+
+    // ============ SMOOTH PAGE TRANSITIONS ============
+    function navigateTo(e, url) {
+      e.preventDefault();
+      const overlay = document.getElementById('pageTransition');
+      overlay.classList.add('active');
+      setTimeout(() => {
+        window.location.href = url;
+      }, 800);
+    }
+
+    // Fade in on page load (arriving from another page)
+    window.addEventListener('pageshow', function (e) {
+      const overlay = document.getElementById('pageTransition');
+      overlay.classList.remove('active');
+    });
+
+    // Handle browser back/forward
+    window.addEventListener('popstate', function () {
+      const overlay = document.getElementById('pageTransition');
+      overlay.classList.remove('active');
+    });
+  </script>
+</body>
+
+</html>

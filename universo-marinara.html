@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>O Universo de Marinara</title>
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23060a14'/%3E%3Cpath d='M16 4l2.5 9.5L28 16l-9.5 2.5L16 28l-2.5-9.5L4 16l9.5-2.5Z' fill='%23d4a574'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%23f0d4a8'/%3E%3C/svg%3E">
+  <meta name="description"
+    content="Explore um céu de estrelas e descubra as constelações que guardam os fragmentos da nossa história.">
+  <meta property="og:title" content="O Universo de Marinara — Onde as Estrelas Se Encontram">
+  <meta property="og:description"
+    content="Explore um céu de estrelas e descubra as constelações que guardam os fragmentos da nossa história.">
+  <meta name="theme-color" content="#060a14">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Petit+Formal+Script&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-deep: #060a14;
+      --bg-mid: #0c1220;
+      --gold: #d4a574;
+      --gold-light: #f0d4a8;
+      --gold-bright: #f5deb3;
+      --cream: #f5e6d3;
+      --cream-soft: #e8d5c0;
+      --blue-soft: #4a6fa5;
+      --rose: #c47a7a;
+      --green-eye: #7ab88f;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg-deep);
+      font-family: 'Lora', serif;
+      color: var(--cream);
+      cursor: default;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    canvas#starfield {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    /* ============ INTRO SCREEN ============ */
+    #intro {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 50% 60%, #111833 0%, #0a0e1a 50%, #050810 100%);
+      opacity: 1;
+      transition: opacity 1.8s ease;
+    }
+
+    #intro.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .intro-moon {
+      width: 6px;
+      height: 6px;
+      background: var(--gold-light);
+      border-radius: 50%;
+      box-shadow: 0 0 40px 15px rgba(212, 165, 116, 0.3), 0 0 80px 30px rgba(212, 165, 116, 0.15);
+      animation: moonPulse 4s ease-in-out infinite;
+      margin-bottom: 50px;
+    }
+
+    @keyframes moonPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 40px 15px rgba(212, 165, 116, 0.3), 0 0 80px 30px rgba(212, 165, 116, 0.15);
+      }
+
+      50% {
+        box-shadow: 0 0 50px 20px rgba(212, 165, 116, 0.4), 0 0 100px 40px rgba(212, 165, 116, 0.2);
+      }
+    }
+
+    .intro-subtitle {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 14px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0;
+      animation: fadeUp 2s ease 0.5s forwards;
+      margin-bottom: 20px;
+    }
+
+    .intro-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(36px, 8vw, 72px);
+      color: var(--cream);
+      opacity: 0;
+      animation: fadeUp 2s ease 1s forwards;
+      margin-bottom: 12px;
+      text-align: center;
+      line-height: 1.2;
+    }
+
+    .intro-title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .intro-quote {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: clamp(13px, 2.5vw, 16px);
+      color: var(--cream-soft);
+      opacity: 0;
+      animation: fadeUp 2s ease 1.8s forwards;
+      margin-top: 10px;
+      max-width: 500px;
+      text-align: center;
+      line-height: 1.7;
+      padding: 0 20px;
+    }
+
+    .intro-begin {
+      margin-top: 50px;
+      background: none;
+      border: 1px solid rgba(212, 165, 116, 0.4);
+      color: var(--gold-light);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      padding: 14px 40px;
+      cursor: pointer;
+      opacity: 0;
+      animation: fadeUp 2s ease 2.6s forwards;
+      transition: all 0.5s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .intro-begin::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(212, 165, 116, 0.08);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.5s ease;
+    }
+
+    .intro-begin:hover::before {
+      transform: scaleX(1);
+    }
+
+    .intro-begin:hover {
+      border-color: var(--gold);
+      box-shadow: 0 0 30px rgba(212, 165, 116, 0.15);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ============ GAME SCREEN ============ */
+    #game {
+      position: fixed;
+      inset: 0;
+      z-index: 10;
+      display: none;
+      opacity: 0;
+      transition: opacity 1.5s ease;
+    }
+
+    #game.active {
+      display: block;
+    }
+
+    #game.visible {
+      opacity: 1;
+    }
+
+    .game-hint {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(212, 165, 116, 0.5);
+      animation: hintPulse 3s ease-in-out infinite;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    @keyframes hintPulse {
+
+      0%,
+      100% {
+        opacity: 0.4;
+      }
+
+      50% {
+        opacity: 0.8;
+      }
+    }
+
+    .progress-bar {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 12px;
+      z-index: 20;
+    }
+
+    .progress-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      border: 1px solid rgba(212, 165, 116, 0.4);
+      background: transparent;
+      transition: all 0.8s ease;
+    }
+
+    .progress-dot.found {
+      background: var(--gold);
+      border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(212, 165, 116, 0.5);
+    }
+
+    /* Constellation key stars (clickable) */
+    .key-star {
+      position: absolute;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      cursor: pointer;
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.3s ease;
+    }
+
+    .key-star:hover {
+      transform: scale(1.3);
+    }
+
+    .key-star .core {
+      width: 5px;
+      height: 5px;
+      background: var(--gold-light);
+      border-radius: 50%;
+      box-shadow: 0 0 8px 3px rgba(240, 212, 168, 0.5), 0 0 20px 6px rgba(212, 165, 116, 0.25);
+      animation: starGlow 2.5s ease-in-out infinite;
+    }
+
+    .key-star.found {
+      pointer-events: none;
+    }
+
+    .key-star.found .core {
+      animation: none;
+      box-shadow: 0 0 12px 5px rgba(212, 165, 116, 0.7);
+    }
+
+    .key-star.hidden {
+      display: none;
+    }
+
+    @keyframes starGlow {
+
+      0%,
+      100% {
+        box-shadow: 0 0 8px 3px rgba(240, 212, 168, 0.5), 0 0 20px 6px rgba(212, 165, 116, 0.25);
+        transform: scale(1);
+      }
+
+      50% {
+        box-shadow: 0 0 14px 5px rgba(240, 212, 168, 0.7), 0 0 30px 10px rgba(212, 165, 116, 0.35);
+        transform: scale(1.2);
+      }
+    }
+
+    /* ============ STORY MODAL ============ */
+    #story-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(6, 10, 20, 0);
+      transition: background 0.8s ease;
+    }
+
+    #story-overlay.active {
+      display: flex;
+      background: rgba(6, 10, 20, 0.85);
+    }
+
+    .story-card {
+      max-width: 560px;
+      width: 90%;
+      text-align: center;
+      opacity: 0;
+      transform: translateY(30px) scale(0.95);
+      animation: cardReveal 1.2s ease 0.3s forwards;
+      position: relative;
+      padding: 40px 30px;
+    }
+
+    @keyframes cardReveal {
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .story-constellation-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 8px;
+    }
+
+    .story-number {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: rgba(212, 165, 116, 0.5);
+      margin-bottom: 20px;
+    }
+
+    .story-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: clamp(26px, 5vw, 38px);
+      color: var(--cream);
+      margin-bottom: 28px;
+      line-height: 1.3;
+    }
+
+    .story-divider {
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0 auto 28px;
+    }
+
+    .story-text {
+      font-family: 'Lora', serif;
+      font-size: clamp(14px, 2.5vw, 16px);
+      line-height: 1.9;
+      color: var(--cream-soft);
+      margin-bottom: 35px;
+    }
+
+    .story-text em {
+      color: var(--gold-light);
+      font-style: italic;
+    }
+
+    .story-text .highlight {
+      color: var(--green-eye);
+    }
+
+    .story-close {
+      background: none;
+      border: 1px solid rgba(212, 165, 116, 0.3);
+      color: var(--gold);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 10px 30px;
+      cursor: pointer;
+      transition: all 0.4s ease;
+    }
+
+    .story-close:hover {
+      border-color: var(--gold);
+      background: rgba(212, 165, 116, 0.1);
+    }
+
+    /* ============ CONSTELLATION LINES (SVG) ============ */
+    #constellation-svg {
+      position: fixed;
+      inset: 0;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    #constellation-svg line {
+      stroke: rgba(212, 165, 116, 0.35);
+      stroke-width: 1;
+      stroke-dasharray: 200;
+      stroke-dashoffset: 200;
+    }
+
+    #constellation-svg line.drawn {
+      animation: drawLine 1.5s ease forwards;
+    }
+
+    @keyframes drawLine {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    #constellation-svg circle.node {
+      fill: var(--gold-light);
+      opacity: 0;
+    }
+
+    #constellation-svg circle.node.visible {
+      animation: nodeAppear 0.5s ease forwards;
+    }
+
+    @keyframes nodeAppear {
+      to {
+        opacity: 0.7;
+      }
+    }
+
+    /* ============ FINALE ============ */
+    #finale {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(6, 10, 20, 0);
+      transition: background 2s ease;
+      overflow-y: auto;
+    }
+
+    #finale.active {
+      display: flex;
+      background: rgba(6, 10, 20, 0.92);
+    }
+
+    .finale-content {
+      max-width: 600px;
+      width: 90%;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .finale-stars-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 11px;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0;
+      animation: fadeUp 2s ease 0.5s forwards;
+      margin-bottom: 25px;
+    }
+
+    .finale-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(30px, 7vw, 52px);
+      color: var(--cream);
+      line-height: 1.3;
+      opacity: 0;
+      animation: fadeUp 2s ease 1s forwards;
+      margin-bottom: 35px;
+    }
+
+    .finale-title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .finale-divider {
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0 auto 35px;
+      opacity: 0;
+      animation: fadeUp 1.5s ease 1.8s forwards;
+    }
+
+    .finale-text {
+      font-family: 'Lora', serif;
+      font-size: clamp(15px, 2.8vw, 18px);
+      line-height: 2;
+      color: var(--cream-soft);
+      opacity: 0;
+      animation: fadeUp 2s ease 2.2s forwards;
+      margin-bottom: 20px;
+    }
+
+    .finale-text em {
+      color: var(--gold-light);
+      font-style: italic;
+    }
+
+    .finale-signature {
+      font-family: 'Petit Formal Script', cursive;
+      font-size: clamp(22px, 5vw, 34px);
+      color: var(--gold);
+      opacity: 0;
+      animation: fadeUp 2s ease 3.5s forwards;
+      margin-top: 40px;
+    }
+
+    .finale-heart {
+      font-size: 20px;
+      opacity: 0;
+      animation: fadeUp 2s ease 4s forwards;
+      margin-top: 15px;
+      color: var(--rose);
+    }
+
+    /* ============ PARTICLES (discovery burst) ============ */
+    .particle {
+      position: fixed;
+      width: 3px;
+      height: 3px;
+      background: var(--gold-light);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 60;
+    }
+
+    /* ============ RESPONSIVE ============ */
+    /* ============ BACK BUTTON ============ */
+    .back-to-book {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      z-index: 90;
+      background: none;
+      border: 1px solid rgba(212, 165, 116, 0.2);
+      color: var(--gold);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 8px 18px;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      text-decoration: none;
+      border-radius: 4px;
+      opacity: 0;
+      animation: fadeUp 1.5s ease 1s forwards;
+    }
+
+    .back-to-book:hover {
+      border-color: var(--gold);
+      background: rgba(212, 165, 116, 0.1);
+      box-shadow: 0 0 20px rgba(212, 165, 116, 0.1);
+    }
+
+    /* ============ PAGE TRANSITION ============ */
+    .page-transition {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #060a14;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    .page-transition.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .page-transition.fade-in {
+      opacity: 1;
+      animation: fadeOut 1s ease 0.3s forwards;
+    }
+
+    @keyframes fadeOut {
+      to {
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .story-card {
+        padding: 30px 20px;
+      }
+
+      .progress-bar {
+        top: 20px;
+        gap: 8px;
+      }
+
+      .game-hint {
+        bottom: 20px;
+        font-size: 11px;
+        letter-spacing: 2px;
+      }
+
+      .key-star {
+        width: 44px;
+        height: 44px;
+      }
+
+      .back-to-book {
+        top: 16px;
+        left: 16px;
+        font-size: 11px;
+        padding: 6px 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- PAGE TRANSITION -->
+  <div class="page-transition fade-in" id="pageTransition"></div>
+
+  <!-- BACK TO BOOK -->
+  <a class="back-to-book" href="index.html" onclick="navigateBack(event)">← Voltar ao Livro</a>
+
+  <canvas id="starfield"></canvas>
+
+  <svg id="constellation-svg"></svg>
+
+  <!-- INTRO -->
+  <div id="intro">
+    <div class="intro-moon"></div>
+    <div class="intro-subtitle">Uma experiência feita para</div>
+    <h1 class="intro-title">O Universo de <em>Marinara</em></h1>
+    <p class="intro-quote">
+      "Em um momento onde as pessoas se afastam por conta da tecnologia e pela distância de um mundo digital e
+      globalizado, duas pessoas se encontraram em um simples e mágico passar de dedos."
+    </p>
+    <button class="intro-begin" onclick="startGame()">Explorar o Céu</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="game">
+    <div class="progress-bar" id="progressBar"></div>
+    <div class="game-hint" id="gameHint">Encontre as estrelas que brilham mais forte</div>
+    <div id="keyStarsContainer"></div>
+  </div>
+
+  <!-- STORY OVERLAY -->
+  <div id="story-overlay">
+    <div class="story-card" id="storyCard">
+      <div class="story-constellation-name" id="storyConstellationName"></div>
+      <div class="story-number" id="storyNumber"></div>
+      <h2 class="story-title" id="storyTitle"></h2>
+      <div class="story-divider"></div>
+      <div class="story-text" id="storyText"></div>
+      <button class="story-close" onclick="closeStory()">Continuar</button>
+    </div>
+  </div>
+
+  <!-- FINALE -->
+  <div id="finale">
+    <div class="finale-content">
+      <div class="finale-stars-label">Todas as constelações encontradas</div>
+      <h1 class="finale-title">O <em>Primeiro Capítulo</em></h1>
+      <div class="finale-divider"></div>
+      <p class="finale-text">
+        Marinara,
+      </p>
+      <p class="finale-text" style="animation-delay: 2.6s;">
+        Cada estrela nesse céu guarda um fragmento do que nasceu em mim desde que você apareceu. Cada constelação é um
+        instante onde eu tive certeza de que algo raro, bonito e verdadeiro estava acontecendo entre nós.
+      </p>
+      <p class="finale-text" style="animation-delay: 3s;">
+        Eu não sei quantas páginas essa história vai ter. Mas sei que quero escrever <em>cada uma delas</em> ao seu
+        lado. Quero que cada capítulo tenha o seu sorriso, o brilho dos seus olhos, o calor da sua mão encontrando a
+        minha como se fosse a coisa mais natural do mundo.
+      </p>
+      <p class="finale-text" style="animation-delay: 3.4s;">
+        Isso que você acabou de viver não é um final — é o <em>primeiro capítulo</em> de um livro que eu quero ler e
+        reler todos os dias, sem pular nenhuma linha, sem ter pressa de chegar ao fim. Porque o melhor dessa história é
+        que ela não precisa acabar.
+      </p>
+      <p class="finale-text" style="animation-delay: 3.8s;">
+        Eu quero te ver. Todos os dias. O tempo todo.<br>
+        E mesmo assim, eu sei que vai parecer pouco.
+      </p>
+      <div class="finale-signature" style="animation-delay: 4.4s;">Gustavo</div>
+      <div class="finale-heart" style="animation-delay: 4.8s;">♥</div>
+    </div>
+  </div>
+
+  <script>
+    // ============ STAR FIELD ============
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let W, H;
+    const stars = [];
+    const shootingStars = [];
+
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', () => { resize(); positionKeyStars(); });
+    resize();
+
+    // Create stars
+    for (let i = 0; i < 400; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.5 + 0.3,
+        alpha: Math.random() * 0.8 + 0.2,
+        twinkleSpeed: Math.random() * 0.02 + 0.005,
+        twinkleOffset: Math.random() * Math.PI * 2
+      });
+    }
+
+    function addShootingStar() {
+      if (Math.random() > 0.003) return;
+      shootingStars.push({
+        x: Math.random() * W,
+        y: Math.random() * H * 0.5,
+        vx: (Math.random() - 0.3) * 8,
+        vy: Math.random() * 4 + 2,
+        life: 1,
+        decay: Math.random() * 0.015 + 0.01
+      });
+    }
+
+    let time = 0;
+    function drawStars() {
+      ctx.clearRect(0, 0, W, H);
+
+      // Nebula glow
+      const grd = ctx.createRadialGradient(W * 0.3, H * 0.4, 0, W * 0.3, H * 0.4, W * 0.5);
+      grd.addColorStop(0, 'rgba(30,40,80,0.12)');
+      grd.addColorStop(1, 'transparent');
+      ctx.fillStyle = grd;
+      ctx.fillRect(0, 0, W, H);
+
+      const grd2 = ctx.createRadialGradient(W * 0.7, H * 0.6, 0, W * 0.7, H * 0.6, W * 0.4);
+      grd2.addColorStop(0, 'rgba(80,40,60,0.08)');
+      grd2.addColorStop(1, 'transparent');
+      ctx.fillStyle = grd2;
+      ctx.fillRect(0, 0, W, H);
+
+      time += 0.016;
+
+      // Stars
+      stars.forEach(s => {
+        const twinkle = Math.sin(time * s.twinkleSpeed * 60 + s.twinkleOffset) * 0.3 + 0.7;
+        const a = s.alpha * twinkle;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(245,230,211,${a})`;
+        ctx.fill();
+        if (s.r > 1.2) {
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.r * 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(212,165,116,${a * 0.15})`;
+          ctx.fill();
+        }
+      });
+
+      // Shooting stars
+      addShootingStar();
+      for (let i = shootingStars.length - 1; i >= 0; i--) {
+        const ss = shootingStars[i];
+        ss.x += ss.vx;
+        ss.y += ss.vy;
+        ss.life -= ss.decay;
+        if (ss.life <= 0) { shootingStars.splice(i, 1); continue; }
+        ctx.beginPath();
+        ctx.moveTo(ss.x, ss.y);
+        ctx.lineTo(ss.x - ss.vx * 6, ss.y - ss.vy * 6);
+        ctx.strokeStyle = `rgba(240,212,168,${ss.life * 0.6})`;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+      }
+
+      requestAnimationFrame(drawStars);
+    }
+    drawStars();
+
+    // ============ CONSTELLATIONS DATA ============
+    const constellations = [
+      {
+        id: 'swipe',
+        name: 'Constelação I',
+        title: 'O Passar dos Dedos',
+        posRatio: { x: 0.18, y: 0.28 },
+        nodes: [
+          { dx: 0, dy: 0 }, { dx: 35, dy: -25 }, { dx: 70, dy: -10 },
+          { dx: 55, dy: 25 }, { dx: 90, dy: 35 }
+        ],
+        lines: [[0, 1], [1, 2], [2, 3], [3, 4]],
+        text: `Uma segunda-feira comum que o destino decidiu tornar inesquecível. Eu te disse que você parecia ser <em>a companhia perfeita para uma conversa sob as estrelas</em> — sem imaginar que estava descrevendo o que nos tornaríamos. A cada mensagem sua, algo em mim acendia. Eu, que nunca esperei ansioso por ninguém, me descobri contando os minutos até a próxima palavra sua, a qualquer hora, em qualquer lugar. <em>Uma inquietação doce no peito, dessas que a gente não quer que passe nunca.</em>`
+      },
+      {
+        id: 'rain',
+        name: 'Constelação II',
+        title: 'A Chuva que Nos Uniu',
+        posRatio: { x: 0.72, y: 0.2 },
+        nodes: [
+          { dx: 0, dy: 0 }, { dx: -20, dy: 35 }, { dx: 15, dy: 60 },
+          { dx: 50, dy: 45 }, { dx: 40, dy: 10 }
+        ],
+        lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 0]],
+        text: `Sexta-feira. Eu saí do carro para te esperar e, quando te vi caminhando na minha direção, o mundo inteiro fez silêncio. <em>"Ela é maravilhosa"</em> — foi tudo que minha mente conseguiu formar. Depois veio o seu perfume, que ficou na minha pele como uma promessa. Depois, aquele abraço leve que já tinha gosto de intimidade. Sentamos ao ar livre e o céu decidiu que queria participar da nossa história — começou a chover. E você ficou. Ficou com a chuva, ficou comigo. Naquele instante eu entendi: <em>essa mulher é do tipo que fica.</em> Quando o temporal nos fez correr pra dentro, rindo e molhados, senti que a chuva só estava nos empurrando pra mais perto.`
+      },
+      {
+        id: 'hands',
+        name: 'Constelação III',
+        title: 'O Calor das Mãos',
+        posRatio: { x: 0.35, y: 0.55 },
+        nodes: [
+          { dx: 0, dy: 0 }, { dx: 30, dy: -20 }, { dx: 60, dy: -5 },
+          { dx: 45, dy: 25 }, { dx: 15, dy: 20 }
+        ],
+        lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 0]],
+        text: `O vinho abriu espaço pra uma conversa que não precisava de esforço. Você era engraçada, espontânea, inteira — sem jogos, sem máscaras, sem ensaio. Uma honestidade bonita que me fez confiar em você antes mesmo de perceber que já confiava. E ali, no meio daquela naturalidade, minha mão encontrou a sua sobre a mesa. E algo aconteceu que eu ainda não consigo explicar: <em>a temperatura do seu corpo era exatamente a mesma que a do meu</em>. Como se a gente já se conhecesse por dentro. Uma conexão silenciosa, física, que disse tudo o que as palavras ainda não tinham coragem de dizer.`
+      },
+      {
+        id: 'eyes',
+        name: 'Constelação IV',
+        title: 'Olhos de Estrela',
+        posRatio: { x: 0.78, y: 0.58 },
+        nodes: [
+          { dx: 0, dy: 10 }, { dx: 25, dy: -15 }, { dx: 55, dy: -15 },
+          { dx: 80, dy: 10 }, { dx: 55, dy: 25 }, { dx: 25, dy: 25 }
+        ],
+        lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0]],
+        text: `Eu tentava prestar atenção no que você dizia, mas os meus olhos insistiam em se perder nos seus. Esse <span class="highlight">verde profundo, vivo, brilhante</span> — como se dentro deles existisse um universo próprio. E o seu sorriso, Marinara... o seu sorriso muda a gravidade de qualquer lugar onde você esteja. São as duas coisas que eu mais busco em alguém, e em você elas existem de um jeito que eu nunca tinha visto. <em>Eu me perdia te olhando e encontrava exatamente onde queria estar.</em> Se os olhos são feitos de estrelas, os seus são constelações inteiras — e eu quero uma vida inteira pra mapear cada brilho.`
+      },
+      {
+        id: 'rose',
+        name: 'Constelação V',
+        title: 'A Rosa Escondida',
+        posRatio: { x: 0.22, y: 0.75 },
+        nodes: [
+          { dx: 20, dy: 0 }, { dx: 40, dy: -20 }, { dx: 30, dy: -40 },
+          { dx: 10, dy: -20 }, { dx: 0, dy: -40 }, { dx: 20, dy: -55 }
+        ],
+        lines: [[0, 1], [1, 2], [0, 3], [3, 4], [4, 5], [2, 5]],
+        text: `No carro, depois do jantar, o espaço entre nós deixou de existir. Nosso primeiro beijo foi como deveria ser: <em>intenso, entregue, com uma urgência bonita</em> — e com aquele toque de ousadia que me encanta em você, mãos que não pedem licença porque já sabem o caminho. Quando nos separamos, sem que você percebesse, minha mão foi ao banco de trás. Peguei a rosa vermelha que estava escondida ali desde o começo da noite — e coloquei nas suas mãos. <em>A sua reação eu guardo como um dos meus tesouros mais bonitos.</em> Aquele sorriso abobado, os olhos brilhando mais do que qualquer estrela desse céu. Naquele instante, eu soube o que é fazer alguém feliz e ser feliz ao mesmo tempo.`
+      },
+      {
+        id: 'night',
+        name: 'Constelação VI',
+        title: 'A Noite Sem Fim',
+        posRatio: { x: 0.55, y: 0.8 },
+        nodes: [
+          { dx: 0, dy: 0 }, { dx: 30, dy: -30 }, { dx: 65, dy: -20 },
+          { dx: 80, dy: 10 }, { dx: 50, dy: 20 }, { dx: 20, dy: 15 }
+        ],
+        lines: [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0], [1, 4]],
+        text: `Paramos o carro num canto só nosso, onde o mundo não chegava. Banco de trás, sem pressa, sem relógio. Beijos que recomeçavam quando a gente tentava parar, conversas sussurradas entre sorrisos, o seu corpo buscando o meu como se o espaço entre nós fosse demais. Cada toque, cada provocação carinhosa, tudo tinha um gosto de <em>"eu quero mais disso pra sempre"</em> — mas sem urgência, porque o que era bom já estava acontecendo. As horas desapareceram. E antes de te deixar em casa, eu disse que queria te ver no dia seguinte. Porque naquela noite, pela primeira vez, tive a certeza mais bonita da minha vida: <em>é ela.</em>`
+      }
+    ];
+
+    let foundCount = 0;
+    let currentStory = null;
+    let gameStarted = false;
+
+    // ============ POSITION KEY STARS ============
+    function positionKeyStars() {
+      const container = document.getElementById('keyStarsContainer');
+      container.innerHTML = '';
+      constellations.forEach((c, i) => {
+        const star = document.createElement('div');
+        star.className = 'key-star';
+        star.id = `star-${c.id}`;
+        star.style.left = `${c.posRatio.x * 100}%`;
+        star.style.top = `${c.posRatio.y * 100}%`;
+        star.innerHTML = '<div class="core"></div>';
+        star.onclick = () => discoverConstellation(i);
+        if (c.found) star.classList.add('found');
+        container.appendChild(star);
+      });
+    }
+
+    // ============ PROGRESS BAR ============
+    function buildProgress() {
+      const bar = document.getElementById('progressBar');
+      bar.innerHTML = '';
+      for (let i = 0; i < constellations.length; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'progress-dot';
+        dot.id = `prog-${i}`;
+        bar.appendChild(dot);
+      }
+    }
+
+    // ============ START GAME ============
+    function startGame() {
+      const intro = document.getElementById('intro');
+      const game = document.getElementById('game');
+      intro.classList.add('hidden');
+      setTimeout(() => {
+        intro.style.display = 'none';
+        game.classList.add('active');
+        requestAnimationFrame(() => game.classList.add('visible'));
+        gameStarted = true;
+        positionKeyStars();
+        buildProgress();
+      }, 1800);
+    }
+
+    // ============ DISCOVER CONSTELLATION ============
+    function discoverConstellation(index) {
+      const c = constellations[index];
+      if (c.found) return;
+      c.found = true;
+      foundCount++;
+
+      // Mark star
+      const starEl = document.getElementById(`star-${c.id}`);
+      starEl.classList.add('found');
+
+      // Update progress
+      const prog = document.getElementById(`prog-${index}`);
+      prog.classList.add('found');
+
+      // Burst particles
+      const rect = starEl.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      createBurst(cx, cy);
+
+      // Draw constellation lines
+      drawConstellationLines(c);
+
+      // Update hint
+      if (foundCount < constellations.length) {
+        document.getElementById('gameHint').textContent =
+          `${constellations.length - foundCount} constelação${constellations.length - foundCount > 1 ? 'ões' : ''} restante${constellations.length - foundCount > 1 ? 's' : ''}`;
+      } else {
+        document.getElementById('gameHint').textContent = '';
+      }
+
+      // Show story after a beat
+      setTimeout(() => showStory(index), 800);
+    }
+
+    // ============ DRAW CONSTELLATION ============
+    function drawConstellationLines(c) {
+      const svg = document.getElementById('constellation-svg');
+      const baseX = c.posRatio.x * window.innerWidth;
+      const baseY = c.posRatio.y * window.innerHeight;
+
+      // Draw nodes
+      c.nodes.forEach((n, i) => {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', baseX + n.dx);
+        circle.setAttribute('cy', baseY + n.dy);
+        circle.setAttribute('r', 2);
+        circle.classList.add('node');
+        svg.appendChild(circle);
+        setTimeout(() => circle.classList.add('visible'), i * 100);
+      });
+
+      // Draw lines
+      c.lines.forEach((pair, i) => {
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        const n1 = c.nodes[pair[0]];
+        const n2 = c.nodes[pair[1]];
+        line.setAttribute('x1', baseX + n1.dx);
+        line.setAttribute('y1', baseY + n1.dy);
+        line.setAttribute('x2', baseX + n2.dx);
+        line.setAttribute('y2', baseY + n2.dy);
+        svg.appendChild(line);
+        setTimeout(() => line.classList.add('drawn'), 200 + i * 200);
+      });
+    }
+
+    // ============ PARTICLE BURST ============
+    function createBurst(cx, cy) {
+      for (let i = 0; i < 20; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        p.style.left = cx + 'px';
+        p.style.top = cy + 'px';
+        document.body.appendChild(p);
+
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * 80 + 30;
+        const dx = Math.cos(angle) * dist;
+        const dy = Math.sin(angle) * dist;
+        const dur = Math.random() * 800 + 600;
+
+        p.animate([
+          { transform: 'translate(0,0) scale(1)', opacity: 1 },
+          { transform: `translate(${dx}px,${dy}px) scale(0)`, opacity: 0 }
+        ], { duration: dur, easing: 'cubic-bezier(0,0.5,0.5,1)' });
+
+        setTimeout(() => p.remove(), dur);
+      }
+    }
+
+    // ============ SHOW / CLOSE STORY ============
+    function showStory(index) {
+      const c = constellations[index];
+      currentStory = index;
+
+      document.getElementById('storyConstellationName').textContent = c.name;
+      document.getElementById('storyNumber').textContent = `${index + 1} de ${constellations.length}`;
+      document.getElementById('storyTitle').textContent = c.title;
+      document.getElementById('storyText').innerHTML = c.text;
+
+      // Reset animation
+      const card = document.getElementById('storyCard');
+      card.style.animation = 'none';
+      card.offsetHeight;
+      card.style.animation = '';
+
+      const overlay = document.getElementById('story-overlay');
+      overlay.classList.add('active');
+    }
+
+    function closeStory() {
+      const overlay = document.getElementById('story-overlay');
+      overlay.classList.remove('active');
+
+      // Check if all found
+      if (foundCount >= constellations.length) {
+        setTimeout(() => showFinale(), 1200);
+      }
+    }
+
+    // ============ FINALE ============
+    function showFinale() {
+      document.getElementById('game').style.opacity = '0.3';
+      const finale = document.getElementById('finale');
+      finale.classList.add('active');
+
+      // Grand burst
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => {
+          createBurst(
+            Math.random() * window.innerWidth,
+            Math.random() * window.innerHeight
+          );
+        }, i * 400);
+      }
+    }
+
+    // Prevent context menu
+    document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // ============ SMOOTH PAGE TRANSITIONS ============
+    function navigateBack(e) {
+      e.preventDefault();
+      const overlay = document.getElementById('pageTransition');
+      overlay.classList.remove('fade-in');
+      overlay.classList.add('active');
+      setTimeout(() => { window.location.href = 'index.html'; }, 800);
+    }
+
+    // Fade-in on load
+    window.addEventListener('load', () => {
+      const overlay = document.getElementById('pageTransition');
+      overlay.classList.add('fade-in');
+      setTimeout(() => { overlay.style.display = 'none'; }, 1500);
+    });
+  </script>
+</body>
+
+</html>

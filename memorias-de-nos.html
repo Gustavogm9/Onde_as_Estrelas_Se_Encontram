@@ -1,0 +1,1069 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Memórias de Nós</title>
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23060a14'/%3E%3Cpath d='M16 4l2.5 9.5L28 16l-9.5 2.5L16 28l-2.5-9.5L4 16l9.5-2.5Z' fill='%23d4a574'/%3E%3Ccircle cx='16' cy='16' r='2' fill='%23f0d4a8'/%3E%3C/svg%3E">
+  <meta name="description" content="Um jogo da memória para dois, onde cada par esconde um pedaço da nossa história.">
+  <meta property="og:title" content="Memórias de Nós — Onde as Estrelas Se Encontram">
+  <meta property="og:description"
+    content="Um jogo da memória para dois, onde cada par esconde um pedaço da nossa história.">
+  <meta name="theme-color" content="#060a14">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Lora:ital,wght@0,400;0,500;1,400&family=Petit+Formal+Script&display=swap"
+    rel="stylesheet">
+  <style>
+    *,
+    *::before,
+    *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-deep: #060a14;
+      --bg-card: #0f1525;
+      --bg-card-hover: #151d33;
+      --gold: #d4a574;
+      --gold-light: #f0d4a8;
+      --gold-bright: #f5deb3;
+      --cream: #f5e6d3;
+      --cream-soft: #e8d5c0;
+      --blue-soft: #4a6fa5;
+      --rose: #c47a7a;
+      --rose-soft: #d4918f;
+      --green-eye: #7ab88f;
+      --purple-soft: #8a7ab8;
+    }
+
+    html,
+    body {
+      width: 100%;
+      min-height: 100%;
+      background: var(--bg-deep);
+      font-family: 'Lora', serif;
+      color: var(--cream);
+      overflow-x: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ============ STARFIELD BG ============ */
+    .stars-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .star-dot {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(245, 230, 211, 0.6);
+    }
+
+    /* ============ INTRO ============ */
+    #intro {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at 50% 60%, #111833 0%, #0a0e1a 50%, #050810 100%);
+      transition: opacity 1.5s ease;
+      padding: 30px;
+    }
+
+    #intro.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .intro-icon {
+      font-size: 32px;
+      margin-bottom: 30px;
+      opacity: 0;
+      animation: fadeUp 1.5s ease 0.3s forwards;
+    }
+
+    .intro-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 12px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0;
+      animation: fadeUp 1.5s ease 0.6s forwards;
+      margin-bottom: 16px;
+    }
+
+    .intro-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(32px, 7vw, 56px);
+      color: var(--cream);
+      opacity: 0;
+      animation: fadeUp 1.5s ease 1s forwards;
+      text-align: center;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .intro-title em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .intro-desc {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: clamp(13px, 2.5vw, 15px);
+      color: var(--cream-soft);
+      opacity: 0;
+      animation: fadeUp 1.5s ease 1.5s forwards;
+      text-align: center;
+      max-width: 420px;
+      line-height: 1.7;
+      margin-top: 12px;
+    }
+
+    .intro-rules {
+      margin-top: 35px;
+      opacity: 0;
+      animation: fadeUp 1.5s ease 2s forwards;
+      text-align: center;
+      max-width: 380px;
+    }
+
+    .intro-rules p {
+      font-family: 'Lora', serif;
+      font-size: 13px;
+      color: rgba(232, 213, 192, 0.6);
+      line-height: 1.7;
+      margin-bottom: 6px;
+    }
+
+    .intro-rules .rule-highlight {
+      color: var(--gold);
+    }
+
+    .intro-start {
+      margin-top: 40px;
+      background: none;
+      border: 1px solid rgba(212, 165, 116, 0.4);
+      color: var(--gold-light);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      padding: 13px 36px;
+      cursor: pointer;
+      opacity: 0;
+      animation: fadeUp 1.5s ease 2.5s forwards;
+      transition: all 0.4s ease;
+    }
+
+    .intro-start:hover {
+      border-color: var(--gold);
+      background: rgba(212, 165, 116, 0.08);
+      box-shadow: 0 0 25px rgba(212, 165, 116, 0.12);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ============ GAME SCREEN ============ */
+    #gameScreen {
+      position: relative;
+      z-index: 10;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px 15px 30px;
+    }
+
+    #gameScreen.active {
+      display: flex;
+    }
+
+    /* Scoreboard */
+    .scoreboard {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 420px;
+      justify-content: center;
+    }
+
+    .player-score {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(212, 165, 116, 0.15);
+      background: rgba(15, 21, 37, 0.8);
+      min-width: 110px;
+      transition: all 0.5s ease;
+      position: relative;
+    }
+
+    .player-score.active-turn {
+      border-color: var(--gold);
+      background: rgba(212, 165, 116, 0.08);
+      box-shadow: 0 0 20px rgba(212, 165, 116, 0.1);
+    }
+
+    .player-score .turn-indicator {
+      position: absolute;
+      top: -8px;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--gold);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .player-score.active-turn .turn-indicator {
+      opacity: 1;
+    }
+
+    .player-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--cream-soft);
+      margin-bottom: 4px;
+    }
+
+    .player-points {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      font-weight: 300;
+      color: var(--gold-light);
+    }
+
+    .score-vs {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12px;
+      letter-spacing: 3px;
+      color: rgba(212, 165, 116, 0.4);
+    }
+
+    /* Card Grid */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 420px;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+
+    /* Card */
+    .card {
+      aspect-ratio: 3/4;
+      perspective: 800px;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .card.locked {
+      pointer-events: none;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s ease;
+      transform-style: preserve-3d;
+    }
+
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .card-back {
+      background: linear-gradient(145deg, #111a2e 0%, #0c1222 50%, #0a0f1c 100%);
+      border: 1px solid rgba(212, 165, 116, 0.2);
+      position: relative;
+    }
+
+    .card-back::before {
+      content: '';
+      position: absolute;
+      inset: 6px;
+      border: 1px solid rgba(212, 165, 116, 0.1);
+      border-radius: 6px;
+    }
+
+    .card-back::after {
+      content: '✦';
+      font-size: 16px;
+      color: rgba(212, 165, 116, 0.25);
+    }
+
+    .card:hover .card-back {
+      border-color: rgba(212, 165, 116, 0.4);
+      background: linear-gradient(145deg, #151f35 0%, #0f1628 50%, #0c1220 100%);
+    }
+
+    .card-front {
+      background: linear-gradient(145deg, #151d33 0%, #111830 100%);
+      border: 1px solid rgba(212, 165, 116, 0.3);
+      transform: rotateY(180deg);
+      gap: 6px;
+    }
+
+    .card.matched .card-front {
+      border-color: var(--gold);
+      box-shadow: 0 0 15px rgba(212, 165, 116, 0.15);
+    }
+
+    .card-emoji {
+      font-size: clamp(24px, 7vw, 36px);
+      line-height: 1;
+    }
+
+    .card-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(8px, 2.2vw, 11px);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-align: center;
+      padding: 0 4px;
+    }
+
+    /* ============ MATCH TOAST ============ */
+    .match-toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.8);
+      z-index: 60;
+      background: rgba(6, 10, 20, 0.95);
+      border: 1px solid rgba(212, 165, 116, 0.3);
+      border-radius: 16px;
+      padding: 30px 28px;
+      max-width: 360px;
+      width: 88%;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.5s ease;
+    }
+
+    .match-toast.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+      pointer-events: auto;
+    }
+
+    .toast-emoji {
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+
+    .toast-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      color: var(--gold-light);
+      margin-bottom: 6px;
+    }
+
+    .toast-who {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 14px;
+    }
+
+    .toast-message {
+      font-family: 'Lora', serif;
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--cream-soft);
+      margin-bottom: 18px;
+    }
+
+    .toast-message em {
+      color: var(--gold-light);
+      font-style: italic;
+    }
+
+    .toast-close {
+      background: none;
+      border: 1px solid rgba(212, 165, 116, 0.3);
+      color: var(--gold);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 8px 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .toast-close:hover {
+      border-color: var(--gold);
+      background: rgba(212, 165, 116, 0.1);
+    }
+
+    /* ============ FINALE ============ */
+    #gameFinale {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(6, 10, 20, 0);
+      transition: background 1.5s ease;
+      overflow-y: auto;
+      padding: 40px 20px;
+    }
+
+    #gameFinale.active {
+      display: flex;
+      background: rgba(6, 10, 20, 0.95);
+    }
+
+    .finale-box {
+      max-width: 480px;
+      width: 100%;
+      text-align: center;
+    }
+
+    .finale-crown {
+      font-size: 40px;
+      opacity: 0;
+      animation: fadeUp 1.5s ease 0.3s forwards;
+      margin-bottom: 10px;
+    }
+
+    .finale-winner-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 12px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: 0;
+      animation: fadeUp 1.5s ease 0.6s forwards;
+      margin-bottom: 10px;
+    }
+
+    .finale-winner-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: clamp(28px, 6vw, 44px);
+      color: var(--cream);
+      opacity: 0;
+      animation: fadeUp 1.5s ease 1s forwards;
+      margin-bottom: 6px;
+    }
+
+    .finale-score-line {
+      font-family: 'Lora', serif;
+      font-size: 15px;
+      color: var(--cream-soft);
+      opacity: 0;
+      animation: fadeUp 1.5s ease 1.3s forwards;
+      margin-bottom: 30px;
+    }
+
+    .finale-score-line span {
+      color: var(--gold-light);
+      font-weight: 500;
+    }
+
+    .finale-divider {
+      width: 50px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 0 auto 28px;
+      opacity: 0;
+      animation: fadeUp 1s ease 1.6s forwards;
+    }
+
+    .finale-message {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: clamp(14px, 2.8vw, 17px);
+      line-height: 1.9;
+      color: var(--cream-soft);
+      opacity: 0;
+      animation: fadeUp 1.5s ease 2s forwards;
+      margin-bottom: 35px;
+    }
+
+    .finale-message em {
+      color: var(--gold-light);
+      font-style: italic;
+    }
+
+    .finale-restart {
+      background: none;
+      border: 1px solid rgba(212, 165, 116, 0.3);
+      color: var(--gold);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      padding: 11px 30px;
+      cursor: pointer;
+      opacity: 0;
+      animation: fadeUp 1.5s ease 2.8s forwards;
+      transition: all 0.4s ease;
+    }
+
+    .finale-restart:hover {
+      border-color: var(--gold);
+      background: rgba(212, 165, 116, 0.1);
+    }
+
+    /* ============ PARTICLES ============ */
+    .particle-burst {
+      position: fixed;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 70;
+    }
+
+    /* ============ BACK BUTTON ============ */
+    .back-to-book {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      z-index: 90;
+      background: none;
+      border: 1px solid rgba(212, 165, 116, 0.2);
+      color: var(--gold);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 8px 18px;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      text-decoration: none;
+      border-radius: 4px;
+      opacity: 0;
+      animation: fadeUpBtn 1.5s ease 0.5s forwards;
+    }
+
+    .back-to-book:hover {
+      border-color: var(--gold);
+      background: rgba(212, 165, 116, 0.1);
+      box-shadow: 0 0 20px rgba(212, 165, 116, 0.1);
+    }
+
+    @keyframes fadeUpBtn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ============ PAGE TRANSITION ============ */
+    .page-transition {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #060a14;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.8s ease;
+    }
+
+    .page-transition.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .page-transition.fade-in {
+      opacity: 1;
+      animation: fadeOutTransition 1s ease 0.3s forwards;
+    }
+
+    @keyframes fadeOutTransition {
+      to {
+        opacity: 0;
+      }
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 380px) {
+      .card-grid {
+        gap: 7px;
+      }
+
+      .scoreboard {
+        gap: 12px;
+      }
+
+      .player-score {
+        min-width: 90px;
+        padding: 8px 12px;
+      }
+
+      .back-to-book {
+        top: 16px;
+        left: 16px;
+        font-size: 11px;
+        padding: 6px 14px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- PAGE TRANSITION -->
+  <div class="page-transition fade-in" id="pageTransition"></div>
+
+  <!-- BACK TO BOOK -->
+  <a class="back-to-book" href="index.html" onclick="navigateBack(event)">← Voltar ao Livro</a>
+
+  <div class="stars-bg" id="starsBg"></div>
+
+  <!-- INTRO -->
+  <div id="intro">
+    <div class="intro-icon">🃏</div>
+    <div class="intro-label">Um jogo para dois</div>
+    <h1 class="intro-title">Memórias de <em>Nós</em></h1>
+    <p class="intro-desc">
+      Cada carta esconde um pedaço da nossa história. Encontre os pares e descubra o que cada momento guardou.
+    </p>
+    <div class="intro-rules">
+      <p><span class="rule-highlight">Gustavo</span> e <span class="rule-highlight">Marinara</span> se revezam.</p>
+      <p>Vire duas cartas por vez. Se formar um par, ganha o ponto e joga de novo.</p>
+      <p>Quem encontrar mais memórias, vence.</p>
+      <p style="margin-top:8px; color: rgba(212,165,116,0.5);">Mas o verdadeiro prêmio é o que cada par revela.</p>
+    </div>
+    <button class="intro-start" onclick="startGame()">Começar</button>
+  </div>
+
+  <!-- GAME -->
+  <div id="gameScreen">
+    <div class="scoreboard">
+      <div class="player-score active-turn" id="p1Score">
+        <div class="turn-indicator">sua vez</div>
+        <div class="player-name">Gustavo</div>
+        <div class="player-points" id="p1Points">0</div>
+      </div>
+      <div class="score-vs">✦</div>
+      <div class="player-score" id="p2Score">
+        <div class="turn-indicator">sua vez</div>
+        <div class="player-name">Marinara</div>
+        <div class="player-points" id="p2Points">0</div>
+      </div>
+    </div>
+    <div class="card-grid" id="cardGrid"></div>
+  </div>
+
+  <!-- MATCH TOAST -->
+  <div class="match-toast" id="matchToast">
+    <div class="toast-emoji" id="toastEmoji"></div>
+    <div class="toast-title" id="toastTitle"></div>
+    <div class="toast-who" id="toastWho"></div>
+    <div class="toast-message" id="toastMessage"></div>
+    <button class="toast-close" onclick="closeToast()">Continuar</button>
+  </div>
+
+  <!-- FINALE -->
+  <div id="gameFinale">
+    <div class="finale-box">
+      <div class="finale-crown" id="finaleCrown"></div>
+      <div class="finale-winner-label" id="finaleLabel"></div>
+      <div class="finale-winner-name" id="finaleWinner"></div>
+      <div class="finale-score-line" id="finaleScoreLine"></div>
+      <div class="finale-divider"></div>
+      <div class="finale-message" id="finaleMessage"></div>
+      <button class="finale-restart" onclick="restartGame()">Jogar de Novo</button>
+    </div>
+  </div>
+
+  <script>
+    // ============ BACKGROUND STARS ============
+    (function createStars() {
+      const bg = document.getElementById('starsBg');
+      for (let i = 0; i < 200; i++) {
+        const s = document.createElement('div');
+        s.className = 'star-dot';
+        const size = Math.random() * 2 + 0.5;
+        s.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${Math.random() * 100}%; top:${Math.random() * 100}%;
+      opacity:${Math.random() * 0.6 + 0.2};
+      animation: twinkle ${Math.random() * 4 + 3}s ease-in-out ${Math.random() * 3}s infinite alternate;
+    `;
+        bg.appendChild(s);
+      }
+      const style = document.createElement('style');
+      style.textContent = `@keyframes twinkle { from{opacity:0.15} to{opacity:0.7} }`;
+      document.head.appendChild(style);
+    })();
+
+    // ============ CARD DATA ============
+    const cardPairs = [
+      {
+        id: 'match',
+        emoji: '📱',
+        label: 'O Match',
+        title: 'O Passar dos Dedos',
+        message: `Um gesto simples que mudou duas vidas. Na segunda-feira, um match. Na terça, borboletas. Na quarta, certeza. <em>Às vezes o destino cabe na ponta dos dedos.</em>`
+      },
+      {
+        id: 'stars',
+        emoji: '✨',
+        label: 'As Estrelas',
+        title: 'Uma Conversa Sob as Estrelas',
+        message: `"Você parece ser a companhia perfeita para uma conversa sob as estrelas." Uma cantada que virou profecia — porque desde aquela noite, <em>cada céu que eu olho tem o formato de você.</em>`
+      },
+      {
+        id: 'rain',
+        emoji: '🌧️',
+        label: 'A Chuva',
+        title: 'A Chuva que Escolheu a Gente',
+        message: `O céu poderia ter esperado. Mas decidiu testar. E você ficou — ficou com a chuva, ficou comigo, ficou rindo enquanto corríamos pra dentro. <em>Naquela chuva eu entendi: essa mulher é do tipo que fica.</em>`
+      },
+      {
+        id: 'hands',
+        emoji: '🤲',
+        label: 'As Mãos',
+        title: 'A Mesma Temperatura',
+        message: `Quando minha mão encontrou a sua sobre a mesa do restaurante, algo impossível de explicar aconteceu: <em>a temperatura do seu corpo era exatamente a mesma que a do meu.</em> Como se a gente já se conhecesse por dentro.`
+      },
+      {
+        id: 'eyes',
+        emoji: '👁️',
+        label: 'Os Olhos',
+        title: 'Verde como Nenhum Outro',
+        message: `Esse verde profundo, vivo, brilhante. Eu tentava prestar atenção na conversa, mas seus olhos não me deixavam ir embora. <em>Me perdi olhando pra você e encontrei exatamente onde queria estar.</em>`
+      },
+      {
+        id: 'rose',
+        emoji: '🌹',
+        label: 'A Rosa',
+        title: 'A Surpresa Escondida',
+        message: `A rosa vermelha esperou a noite inteira no banco de trás. E quando finalmente chegou às suas mãos, <em>o seu sorriso abobado e os olhos brilhando me ensinaram o que é fazer alguém feliz e ser feliz ao mesmo tempo.</em>`
+      },
+      {
+        id: 'kiss',
+        emoji: '💋',
+        label: 'O Beijo',
+        title: 'O Primeiro Beijo',
+        message: `Intenso, entregue, com uma urgência bonita. Mãos que não pediram licença porque já sabiam o caminho. <em>Um beijo que tinha gosto de começo — desses que a gente sente que vai lembrar pra sempre.</em>`
+      },
+      {
+        id: 'night',
+        emoji: '🌙',
+        label: 'A Noite',
+        title: 'A Noite que Não Acabou',
+        message: `Banco de trás, sem pressa, sem relógio. Beijos que recomeçavam quando a gente tentava parar. E antes de te levar pra casa, uma certeza que nunca mais saiu: <em>é ela.</em>`
+      }
+    ];
+
+    // ============ GAME STATE ============
+    let cards = [];
+    let flippedCards = [];
+    let matchedPairs = 0;
+    let currentPlayer = 1; // 1 = Gustavo, 2 = Marinara
+    let scores = { 1: 0, 2: 0 };
+    let isLocked = false;
+
+    // ============ INIT GAME ============
+    function startGame() {
+      document.getElementById('intro').classList.add('hidden');
+      setTimeout(() => {
+        document.getElementById('intro').style.display = 'none';
+        document.getElementById('gameScreen').classList.add('active');
+        buildGrid();
+      }, 1500);
+    }
+
+    function buildGrid() {
+      const grid = document.getElementById('cardGrid');
+      grid.innerHTML = '';
+
+      // Create pairs
+      let deck = [];
+      cardPairs.forEach(pair => {
+        deck.push({ ...pair, uid: pair.id + '_a' });
+        deck.push({ ...pair, uid: pair.id + '_b' });
+      });
+
+      // Shuffle
+      for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+      }
+
+      cards = deck;
+
+      deck.forEach((card, index) => {
+        const el = document.createElement('div');
+        el.className = 'card';
+        el.dataset.index = index;
+        el.dataset.id = card.id;
+        el.innerHTML = `
+      <div class="card-inner">
+        <div class="card-face card-back"></div>
+        <div class="card-face card-front">
+          <div class="card-emoji">${card.emoji}</div>
+          <div class="card-label">${card.label}</div>
+        </div>
+      </div>
+    `;
+        el.addEventListener('click', () => flipCard(el, index));
+        grid.appendChild(el);
+      });
+    }
+
+    // ============ FLIP LOGIC ============
+    function flipCard(el, index) {
+      if (isLocked) return;
+      if (el.classList.contains('flipped') || el.classList.contains('matched')) return;
+      if (flippedCards.length >= 2) return;
+
+      el.classList.add('flipped');
+      flippedCards.push({ el, index, id: cards[index].id });
+
+      if (flippedCards.length === 2) {
+        isLocked = true;
+        const [a, b] = flippedCards;
+
+        if (a.id === b.id) {
+          // MATCH!
+          setTimeout(() => {
+            a.el.classList.add('matched', 'locked');
+            b.el.classList.add('matched', 'locked');
+            scores[currentPlayer]++;
+            updateScores();
+            matchedPairs++;
+
+            // Burst particles
+            const rectA = a.el.getBoundingClientRect();
+            const rectB = b.el.getBoundingClientRect();
+            createBurst(rectA.left + rectA.width / 2, rectA.top + rectA.height / 2);
+            createBurst(rectB.left + rectB.width / 2, rectB.top + rectB.height / 2);
+
+            // Show toast
+            const pair = cardPairs.find(p => p.id === a.id);
+            showToast(pair);
+
+            flippedCards = [];
+            // Player goes again on match (don't switch)
+          }, 600);
+        } else {
+          // No match
+          setTimeout(() => {
+            a.el.classList.remove('flipped');
+            b.el.classList.remove('flipped');
+            flippedCards = [];
+            switchPlayer();
+            isLocked = false;
+          }, 1000);
+        }
+      }
+    }
+
+    function switchPlayer() {
+      currentPlayer = currentPlayer === 1 ? 2 : 1;
+      updateTurnIndicator();
+    }
+
+    function updateScores() {
+      document.getElementById('p1Points').textContent = scores[1];
+      document.getElementById('p2Points').textContent = scores[2];
+    }
+
+    function updateTurnIndicator() {
+      const p1 = document.getElementById('p1Score');
+      const p2 = document.getElementById('p2Score');
+      p1.classList.toggle('active-turn', currentPlayer === 1);
+      p2.classList.toggle('active-turn', currentPlayer === 2);
+    }
+
+    // ============ TOAST ============
+    function showToast(pair) {
+      const toast = document.getElementById('matchToast');
+      document.getElementById('toastEmoji').textContent = pair.emoji;
+      document.getElementById('toastTitle').textContent = pair.title;
+      document.getElementById('toastWho').textContent =
+        currentPlayer === 1 ? '✦ Gustavo encontrou ✦' : '✦ Marinara encontrou ✦';
+      document.getElementById('toastMessage').innerHTML = pair.message;
+      toast.classList.add('show');
+    }
+
+    function closeToast() {
+      const toast = document.getElementById('matchToast');
+      toast.classList.remove('show');
+      isLocked = false;
+
+      if (matchedPairs >= cardPairs.length) {
+        setTimeout(showFinale, 800);
+      }
+    }
+
+    // ============ FINALE ============
+    function showFinale() {
+      const finale = document.getElementById('gameFinale');
+      const s1 = scores[1], s2 = scores[2];
+
+      let crown, label, winner, message;
+
+      if (s1 > s2) {
+        crown = '🏆';
+        label = 'Vencedor desta noite';
+        winner = 'Gustavo';
+        message = `Gustavo encontrou mais memórias — mas convenhamos, <em>todas elas têm o nome da Marinara</em>. Nesse jogo, quem ama mais sempre vence.`;
+      } else if (s2 > s1) {
+        crown = '👑';
+        label = 'Vencedora desta noite';
+        winner = 'Marinara';
+        message = `Marinara guardou mais memórias no coração — e na pontuação. <em>Mas o verdadeiro troféu é saber que cada uma dessas memórias é sobre nós dois.</em>`;
+      } else {
+        crown = '💫';
+        label = 'Empate perfeito';
+        winner = 'Gustavo & Marinara';
+        message = `Mesma pontuação, mesmo sentimento. <em>Talvez porque essas memórias nunca foram de um só — sempre foram de nós dois.</em>`;
+      }
+
+      document.getElementById('finaleCrown').textContent = crown;
+      document.getElementById('finaleLabel').textContent = label;
+      document.getElementById('finaleWinner').textContent = winner;
+      document.getElementById('finaleScoreLine').innerHTML = `<span>${s1}</span> a <span>${s2}</span>`;
+      document.getElementById('finaleMessage').innerHTML = message;
+
+      finale.classList.add('active');
+
+      // Celebration burst
+      for (let i = 0; i < 6; i++) {
+        setTimeout(() => {
+          createBurst(Math.random() * window.innerWidth, Math.random() * window.innerHeight);
+        }, i * 300);
+      }
+    }
+
+    function restartGame() {
+      const finale = document.getElementById('gameFinale');
+      finale.classList.remove('active');
+
+      scores = { 1: 0, 2: 0 };
+      matchedPairs = 0;
+      currentPlayer = 1;
+      flippedCards = [];
+      isLocked = false;
+
+      updateScores();
+      updateTurnIndicator();
+      buildGrid();
+    }
+
+    // ============ PARTICLES ============
+    function createBurst(cx, cy) {
+      const colors = ['#d4a574', '#f0d4a8', '#c47a7a', '#7ab88f', '#8a7ab8'];
+      for (let i = 0; i < 15; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle-burst';
+        p.style.left = cx + 'px';
+        p.style.top = cy + 'px';
+        p.style.background = colors[Math.floor(Math.random() * colors.length)];
+        document.body.appendChild(p);
+
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * 70 + 25;
+        const dx = Math.cos(angle) * dist;
+        const dy = Math.sin(angle) * dist;
+        const dur = Math.random() * 700 + 500;
+
+        p.animate([
+          { transform: 'translate(0,0) scale(1)', opacity: 1 },
+          { transform: `translate(${dx}px,${dy}px) scale(0)`, opacity: 0 }
+        ], { duration: dur, easing: 'cubic-bezier(0,0.5,0.5,1)' });
+
+        setTimeout(() => p.remove(), dur);
+      }
+    }
+
+    // Prevent zoom on double tap
+    document.addEventListener('touchstart', function (e) {
+      if (e.touches.length > 1) e.preventDefault();
+    }, { passive: false });
+
+    let lastTap = 0;
+    document.addEventListener('touchend', function (e) {
+      const now = Date.now();
+      if (now - lastTap < 300) e.preventDefault();
+      lastTap = now;
+    }, false);
+
+    // ============ SMOOTH PAGE TRANSITIONS ============
+    function navigateBack(e) {
+      e.preventDefault();
+      const overlay = document.getElementById('pageTransition');
+      overlay.classList.remove('fade-in');
+      overlay.classList.add('active');
+      setTimeout(() => { window.location.href = 'index.html'; }, 800);
+    }
+
+    // Fade-in on load
+    window.addEventListener('load', () => {
+      const overlay = document.getElementById('pageTransition');
+      overlay.classList.add('fade-in');
+      setTimeout(() => { overlay.style.display = 'none'; }, 1500);
+    });
+  </script>
+</body>
+
+</html>
